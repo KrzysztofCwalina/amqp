@@ -42,7 +42,7 @@ public class Program
         var areEqual = a1.Span.SequenceEqual(a2.Span);
         if(!areEqual)
         {
-            Console.WriteLine("Test dod not pass!");
+            Console.WriteLine("Test did not pass!");
             return;
         }
 
