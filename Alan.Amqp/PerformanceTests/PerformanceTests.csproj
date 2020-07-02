@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.11.5" />
-    <PackageReference Include="Microsoft.Azure.Amqp" Version="2.4.3" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.12.1" />
+    <PackageReference Include="Microsoft.Azure.Amqp" Version="2.4.4" />
   </ItemGroup>
 
   <ItemGroup>
