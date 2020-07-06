@@ -8,25 +8,35 @@ using System.Runtime.InteropServices;
 public class AmqpBench
 {
     public static readonly byte[] RandomBytes_1MB = new byte[1024 * 1024];
-    public static readonly int[] RandomInt32_1MB = new int[1024 * 1024];
+    public static readonly int[] RandomInt32Array_1M = new int[1024 * 1024];
 
     // buffers for 1M values
     public static readonly ByteBuffer ScratchByteBuffer = new ByteBuffer(new byte[1024 * 1024 * 10], autoGrow: false);
     public static readonly byte[] ScratchArray = new byte[1024 * 1024 * 10];
 
+    public static readonly int[] ScratchInt32Array = new int[1024 * 1024 * 2];
+
     public static readonly byte[] EncodedBytes_1MB;
     public static readonly ByteBuffer EncodedBytes_1MB_buffer;
+
+    public static readonly byte[] EncodedInt32Array_1M;
+    public static readonly ByteBuffer EncodedInt32Array_1M_buffer;
 
     static AmqpBench()
     {
         Random rng = new Random(0);
         rng.NextBytes(RandomBytes_1MB);
-        rng.NextBytes(MemoryMarshal.AsBytes(RandomInt32_1MB.AsSpan()));
+        rng.NextBytes(MemoryMarshal.AsBytes(RandomInt32Array_1M.AsSpan()));
 
         ScratchByteBuffer.Reset();
         AmqpCodec.EncodeBinary(RandomBytes_1MB, ScratchByteBuffer);
         EncodedBytes_1MB = ScratchByteBuffer.Buffer.AsMemory(0, ScratchByteBuffer.WritePos).ToArray();
         EncodedBytes_1MB_buffer = new ByteBuffer(EncodedBytes_1MB, 0, EncodedBytes_1MB.Length);
+
+        ScratchByteBuffer.Reset();
+        AmqpCodec.EncodeArray(RandomInt32Array_1M, ScratchByteBuffer);
+        EncodedInt32Array_1M = ScratchByteBuffer.Buffer.AsMemory(0, ScratchByteBuffer.WritePos).ToArray();
+        EncodedInt32Array_1M_buffer = new ByteBuffer(EncodedInt32Array_1M, 0, EncodedInt32Array_1M.Length);
     }
 }
 
@@ -52,14 +62,14 @@ public class EncoderBench : AmqpBench
     public ReadOnlyMemory<byte> Int32_Encode1M_MA()
     {
         ScratchByteBuffer.Reset();
-        AmqpCodec.EncodeArray(RandomInt32_1MB, ScratchByteBuffer);
+        AmqpCodec.EncodeArray(RandomInt32Array_1M, ScratchByteBuffer);
         return ScratchByteBuffer.Buffer.AsMemory(0, ScratchByteBuffer.WritePos);
     }
 
     [Benchmark]
     public ReadOnlyMemory<byte> Int32_Encode1M_SP()
     {
-        AmqpWriter.TryWriteArray(ScratchArray, RandomInt32_1MB, out int written);
+        AmqpWriter.TryWriteArray(ScratchArray, RandomInt32Array_1M, out int written);
         return ScratchArray.AsMemory(0, written);
     }
 
@@ -90,6 +100,44 @@ public class DecoderBench : AmqpBench
         reader.Read();
         var bytes = reader.Bytes;
         return bytes.Length;
+    }
+
+    [Benchmark]
+    public int Bytes_Decode1MB_SP_ToArray()
+    {
+        var reader = new AmqpReader(EncodedBytes_1MB);
+        reader.Read();
+        var bytes = reader.Bytes.ToArray();
+        return bytes.Length;
+    }
+
+    [Benchmark]
+    public int ArrayInt32_Decode1M_MA()
+    {
+        EncodedInt32Array_1M_buffer.Seek(0);
+        var result = AmqpCodec.DecodeArray<int>(EncodedInt32Array_1M_buffer);
+        return result.Length;
+    }
+
+    [Benchmark]
+    public int ArrayInt32_Decode1M_SP()
+    {
+        var reader = new AmqpReader(EncodedInt32Array_1M);
+        reader.Read();
+        if(!reader.TryGetInt32Array(ScratchInt32Array, out int written))
+        {
+            throw new InvalidOperationException("buffer too small");
+        }
+        return written;
+    }
+
+    [Benchmark]
+    public int ArrayInt32_Decode1M_SP_ToArray()
+    {
+        var reader = new AmqpReader(EncodedInt32Array_1M);
+        reader.Read();
+        int[] ints = reader.GetInt32Array();
+        return ints.Length;
     }
 }
 

@@ -13,16 +13,17 @@ namespace Tests
         readonly static string s_text = "Hello Glorious Messaging World";
         readonly ReadOnlyMemory<byte> s_text_bytes = Encoding.UTF8.GetBytes(s_text);
 
-        public readonly byte[] _randomBytes1_MB = new byte[1024 * 1024];
+        public readonly byte[] _randomBytes1_MB = new byte[1000 * 1000];
         byte[] _encodedBytes_1MB;
 
-        public readonly int[] _randomInt32_1M = new int[1024 * 1024];
+        public readonly int[] _randomInt32_1M = new int[1000 * 1000];
         byte[] _encodedInt32_1M;
 
         // buffers for 1M values
         public readonly ByteBuffer _scratchByteBuffer = new ByteBuffer(new byte[1024 * 1024 * 10], autoGrow: false);
-        public readonly byte[] _scratchArray = new byte[1024 * 1024 * 10];
+        public readonly byte[] _scratchByteArray = new byte[1024 * 1024 * 10];
 
+        public static readonly int[] ScratchInt32Array = new int[1024 * 1024 * 2];
 
         [SetUp]
         public void Setup()
@@ -65,6 +66,23 @@ namespace Tests
             var reader = new AmqpReader(_encodedInt32_1M);
             Assert.True(reader.Read());
             Assert.AreEqual(AmqpType.ArrayStart, reader.Type);
+            int[] decoded = reader.GetInt32Array();
+            Assert.True(_randomInt32_1M.AsSpan().SequenceEqual(decoded));
+        }
+
+        [Test]
+        public void ReadSpanInt32()
+        {
+            var reader = new AmqpReader(_encodedInt32_1M);
+            Assert.True(reader.Read());
+            Assert.AreEqual(AmqpType.ArrayStart, reader.Type);
+
+            if (!reader.TryGetInt32Array(ScratchInt32Array, out int written))
+            {
+                throw new InvalidOperationException("buffer too small");
+            }
+
+            Assert.True(ScratchInt32Array.AsSpan(0, written).SequenceEqual(_randomInt32_1M));
         }
 
         [Test]
