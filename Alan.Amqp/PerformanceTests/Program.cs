@@ -5,6 +5,7 @@ using Microsoft.Azure.Amqp;
 using System;
 using System.Runtime.InteropServices;
 
+[MemoryDiagnoser]
 public class Amqp
 {
     public static readonly byte[] _randomBytes1MB = new byte[1024 * 1024];
@@ -14,17 +15,12 @@ public class Amqp
     public static readonly ByteBuffer _scratchByteBuffer = new ByteBuffer(new byte[1024 * 1024 * 10], autoGrow: false);
     public static readonly byte[] _scratchArray = new byte[1024 * 1024 * 10];
 
-    public readonly byte[] _encodedBytesArray;
-    public readonly ByteBuffer _encodedBytesBuffer;
 
     public Amqp()
     {
         Random rng = new Random(0);     
         rng.NextBytes(_randomBytes1MB);
         rng.NextBytes(MemoryMarshal.AsBytes(_randomInt32_1M.AsSpan()));
-
-        _encodedBytesArray = Bytes_Encode1MB_MA().ToArray();
-        _encodedBytesBuffer = new ByteBuffer(_encodedBytesArray);
     }
 
     [Benchmark]
