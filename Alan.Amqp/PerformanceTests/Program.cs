@@ -139,6 +139,20 @@ public class DecoderBench : AmqpBench
         int[] ints = reader.GetInt32Array();
         return ints.Length;
     }
+
+    [Benchmark]
+    public int ArrayInt32_Decode1M_SP_Iterator()
+    {
+        var reader = new AmqpReader(EncodedInt32Array_1M);
+        reader.Read();
+        int len = 0;
+        while (reader.Type != AmqpType.ArrayEnd)
+        {
+            int value = reader.GetInt32();
+            len++;
+        }
+        return len;
+    }
 }
 
 public class Program

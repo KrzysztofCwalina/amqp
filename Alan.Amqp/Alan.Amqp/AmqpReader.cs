@@ -64,6 +64,17 @@ namespace Alan.Amqp
             return result;
         }
 
+        public int GetInt32()
+        {
+            if (Type != AmqpType.ArrayStart || _itemType != AmqpConstructor.Int) throw new InvalidOperationException();
+            if (_currentLength < sizeof(int)) throw new InvalidOperationException();
+            int value = BinaryPrimitives.ReadInt32BigEndian(_buffer.Slice(_current));
+            _current += sizeof(int);
+            _currentLength -= sizeof(int);
+            if (_currentLength == 0) Type = AmqpType.ArrayEnd;
+            return value;
+        }
+
         public bool Read()
         {
             _buffer = _buffer.Slice(_next);
