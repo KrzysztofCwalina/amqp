@@ -2,7 +2,7 @@
 
 namespace Alan.Amqp
 {
-    public enum AmqpConstructor : byte
+    public enum AmqpType : byte
     {
         Descriptor = 0x00,
 
@@ -68,16 +68,16 @@ namespace Alan.Amqp
 
     public static class AmqpParser
     {
-        public static bool TryReadConstructor(Span<byte> span, out AmqpConstructor constructor)
+        public static bool TryReadConstructor(Span<byte> span, out AmqpType constructor)
         {
             if (span.Length == 0)
             {
                 constructor = default;
                 return false;
             }
-            constructor = (AmqpConstructor)span[0];
-            if (constructor == AmqpConstructor.String8) return true;
-            if (constructor == AmqpConstructor.Descriptor) return true;
+            constructor = (AmqpType)span[0];
+            if (constructor == AmqpType.String8) return true;
+            if (constructor == AmqpType.Descriptor) return true;
             return false;
         }
     }

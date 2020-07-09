@@ -1,5 +1,7 @@
 using Alan.Amqp;
 using Microsoft.Azure.Amqp;
+using Microsoft.Azure.Amqp.Encoding;
+using Microsoft.Azure.Amqp.Framing;
 using NUnit.Framework;
 using System;
 using System.Buffers.Binary;
@@ -42,11 +44,46 @@ namespace Tests
         }
 
         [Test]
+        public void ReadDoubleDescribedString8()
+        {
+            string value = "ABC";
+            var descriptor = new DescribedType("GHI", "DEF");
+            var describedValue = new DescribedType(descriptor, value);
+
+            _scratchByteBuffer.Reset();
+            AmqpCodec.EncodeObject(describedValue, _scratchByteBuffer);
+            var encoded = _scratchByteBuffer.Buffer.AsMemory(0, _scratchByteBuffer.WritePos).ToArray();
+            var encodedBuffer = new ByteBuffer(encoded, 0, encoded.Length);
+
+            var decoded = (DescribedType)AmqpCodec.DecodeObject(encodedBuffer);
+            Assert.AreEqual(value, decoded.Value);
+
+            var decodedDescriptor = (DescribedType)decoded.Descriptor;
+            Assert.AreEqual(descriptor.Value, decodedDescriptor.Value);
+            Assert.AreEqual(descriptor.Descriptor, decodedDescriptor.Descriptor);
+
+            var reader = new AmqpReader(encoded);
+            Assert.AreEqual(AmqpToken.Descriptor, reader.MoveNext());
+
+            // let's see what's the type of the descriptor. Oh, it's another descriptor
+            Assert.AreEqual(AmqpToken.Descriptor, reader.MoveNext());
+
+            Assert.AreEqual(AmqpToken.String, reader.MoveNext());
+            var d1 = Encoding.UTF8.GetString(reader.Bytes);
+
+            Assert.AreEqual(AmqpToken.String, reader.MoveNext());
+            var d2 = Encoding.UTF8.GetString(reader.Bytes);
+
+            Assert.AreEqual(AmqpToken.String, reader.MoveNext());
+            var v1 = Encoding.UTF8.GetString(reader.Bytes);
+        }
+
+        [Test]
         public void WriteString8()
         {
             byte[] buffer = new byte[256];
             Assert.True(AmqpWriter.TryWrite(buffer, s_text, out int written));
-            Assert.AreEqual(((byte)AmqpConstructor.String8), buffer[0]);
+            Assert.AreEqual(((byte)AmqpType.String8), buffer[0]);
             Assert.AreEqual(s_text_bytes.Length, buffer[1]);
             Assert.True(s_text_bytes.Span.SequenceEqual(buffer.AsSpan(2, written - 2)));
         }
@@ -55,8 +92,8 @@ namespace Tests
         public void ReadBinary()
         {
             var reader = new AmqpReader(_encodedBytes_1MB);
-            Assert.True(reader.Read());
-            Assert.AreEqual(AmqpType.Binary, reader.Type);
+            Assert.True(reader.MoveNext() == AmqpToken.Binary);
+            Assert.AreEqual(AmqpToken.Binary, reader.CurrentType);
             Assert.True(reader.Bytes.SequenceEqual(_randomBytes1_MB));
         }
 
@@ -64,8 +101,8 @@ namespace Tests
         public void ReadArrayInt32()
         {
             var reader = new AmqpReader(_encodedInt32_1M);
-            Assert.True(reader.Read());
-            Assert.AreEqual(AmqpType.ArrayStart, reader.Type);
+            Assert.True(reader.MoveNext() == AmqpToken.Array);
+            Assert.AreEqual(AmqpToken.Array, reader.CurrentType);
             int[] decoded = reader.GetInt32Array();
             Assert.True(_randomInt32_1M.AsSpan().SequenceEqual(decoded));
         }
@@ -74,8 +111,8 @@ namespace Tests
         public void ReadSpanInt32()
         {
             var reader = new AmqpReader(_encodedInt32_1M);
-            Assert.True(reader.Read());
-            Assert.AreEqual(AmqpType.ArrayStart, reader.Type);
+            Assert.True(reader.MoveNext() == AmqpToken.Array);
+            Assert.AreEqual(AmqpToken.Array, reader.CurrentType);
 
             if (!reader.TryGetInt32Array(ScratchInt32Array, out int written))
             {
@@ -92,11 +129,11 @@ namespace Tests
             AmqpWriter.TryWrite(buffer, s_text, out int written);
 
             var reader = new AmqpReader(buffer.AsSpan().Slice(0, written));
-            while (reader.Read())
+            while (reader.MoveNext() != AmqpToken.EndOfData)
             {
-                switch(reader.Type)
+                switch(reader.CurrentType)
                 {
-                    case AmqpType.Utf8:
+                    case AmqpToken.String:
                         Assert.AreEqual(s_text, Encoding.UTF8.GetString(reader.Bytes));
                         break;
                 }

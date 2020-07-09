@@ -18,7 +18,7 @@ namespace Alan.Amqp
             {
                 bytesWritten = byteCount + headerShort;
                 if (bytesWritten > destination.Length) return false;
-                destination[0] = (byte)AmqpConstructor.String8;
+                destination[0] = (byte)AmqpType.String8;
                 destination[1] = (byte)byteCount;
                 destination = destination.Slice(headerShort);
             }
@@ -26,7 +26,7 @@ namespace Alan.Amqp
             {
                 bytesWritten = byteCount + headerLong;
                 if (bytesWritten > destination.Length) return false;
-                destination[0] = (byte)AmqpConstructor.String32;
+                destination[0] = (byte)AmqpType.String32;
                 BinaryPrimitives.WriteInt32LittleEndian(destination.Slice(1), byteCount);
                 destination = destination.Slice(headerLong);
             }
@@ -45,7 +45,7 @@ namespace Alan.Amqp
             {
                 bytesWritten = byteCount + headerShort;
                 if (bytesWritten > destination.Length) return false;
-                destination[0] = (byte)AmqpConstructor.Binary8;
+                destination[0] = (byte)AmqpType.Binary8;
                 destination[1] = (byte)byteCount;
                 destination = destination.Slice(headerShort);
             }
@@ -53,7 +53,7 @@ namespace Alan.Amqp
             {
                 bytesWritten = byteCount + headerLong;
                 if (bytesWritten > destination.Length) return false;
-                destination[0] = (byte)AmqpConstructor.Binary32;
+                destination[0] = (byte)AmqpType.Binary32;
                 BinaryPrimitives.WriteInt32BigEndian(destination.Slice(1), byteCount);
                 destination = destination.Slice(headerLong);
             }
@@ -73,10 +73,10 @@ namespace Alan.Amqp
                 bytesWritten = headerShort + valueCount * sizeof(int);
                 if (bytesWritten > destination.Length) return false;
 
-                destination[0] = (byte)AmqpConstructor.Array8;
+                destination[0] = (byte)AmqpType.Array8;
                 destination[1] = (byte)sizeof(int);
                 destination[2] = (byte)valueCount;
-                destination[3] = (byte)AmqpConstructor.Int;
+                destination[3] = (byte)AmqpType.Int;
                 destination = destination.Slice(headerShort);
             }
             else
@@ -84,11 +84,11 @@ namespace Alan.Amqp
                 bytesWritten = headerLong + valueCount * sizeof(int);
                 if (bytesWritten > destination.Length) return false;
 
-                destination[0] = (byte)AmqpConstructor.Array32;
+                destination[0] = (byte)AmqpType.Array32;
                 // TODO: size = count (i4) + ctor (i1) + data_size (according to Microsoft.AMQP, but it does make much sense for Array8)
-                BinaryPrimitives.WriteInt32BigEndian(destination.Slice(sizeof(AmqpConstructor)), sizeof(int) + sizeof(byte) + valueCount * sizeof(int));
-                BinaryPrimitives.WriteInt32BigEndian(destination.Slice(sizeof(AmqpConstructor)+sizeof(int)), valueCount);
-                destination[sizeof(AmqpConstructor) + sizeof(int) + sizeof(int)] = (byte)AmqpConstructor.Int;
+                BinaryPrimitives.WriteInt32BigEndian(destination.Slice(sizeof(AmqpType)), sizeof(int) + sizeof(byte) + valueCount * sizeof(int));
+                BinaryPrimitives.WriteInt32BigEndian(destination.Slice(sizeof(AmqpType)+sizeof(int)), valueCount);
+                destination[sizeof(AmqpType) + sizeof(int) + sizeof(int)] = (byte)AmqpType.Int;
                 destination = destination.Slice(headerLong);
             }
 
@@ -105,8 +105,8 @@ namespace Alan.Amqp
             if (destination.Length < 1) return OperationStatus.DestinationTooSmall;
 
             var byteCount = bytes.Length;
-            if (byteCount < 256) destination[0] = (byte)AmqpConstructor.Binary8;
-            else destination[0] = (byte)AmqpConstructor.Binary32;
+            if (byteCount < 256) destination[0] = (byte)AmqpType.Binary8;
+            else destination[0] = (byte)AmqpType.Binary32;
             bytesWritten = 1;
 
             if (destination.Length < 2) return OperationStatus.DestinationTooSmall;

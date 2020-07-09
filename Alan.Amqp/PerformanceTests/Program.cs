@@ -97,7 +97,7 @@ public class DecoderBench : AmqpBench
     public int Bytes_Decode1MB_SP()
     {
         var reader = new AmqpReader(EncodedBytes_1MB);
-        reader.Read();
+        reader.MoveNext();
         var bytes = reader.Bytes;
         return bytes.Length;
     }
@@ -106,7 +106,7 @@ public class DecoderBench : AmqpBench
     public int Bytes_Decode1MB_SP_ToArray()
     {
         var reader = new AmqpReader(EncodedBytes_1MB);
-        reader.Read();
+        reader.MoveNext();
         var bytes = reader.Bytes.ToArray();
         return bytes.Length;
     }
@@ -123,7 +123,7 @@ public class DecoderBench : AmqpBench
     public int ArrayInt32_Decode1M_SP()
     {
         var reader = new AmqpReader(EncodedInt32Array_1M);
-        reader.Read();
+        reader.MoveNext();
         if(!reader.TryGetInt32Array(ScratchInt32Array, out int written))
         {
             throw new InvalidOperationException("buffer too small");
@@ -135,7 +135,7 @@ public class DecoderBench : AmqpBench
     public int ArrayInt32_Decode1M_SP_ToArray()
     {
         var reader = new AmqpReader(EncodedInt32Array_1M);
-        reader.Read();
+        reader.MoveNext();
         int[] ints = reader.GetInt32Array();
         return ints.Length;
     }
@@ -144,11 +144,11 @@ public class DecoderBench : AmqpBench
     public int ArrayInt32_Decode1M_SP_Iterator()
     {
         var reader = new AmqpReader(EncodedInt32Array_1M);
-        reader.Read();
+        reader.MoveNext();
         int len = 0;
-        while (reader.Type != AmqpType.ArrayEnd)
+        while (reader.CurrentType != AmqpToken.ArrayEnd)
         {
-            int value = reader.GetInt32();
+            int value = reader.ReadInt32();
             len++;
         }
         return len;
