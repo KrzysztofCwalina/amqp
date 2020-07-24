@@ -1,10 +1,11 @@
-using Alan.Amqp;
+using System.Buffers.Amqp;
 using Microsoft.Azure.Amqp;
 using Microsoft.Azure.Amqp.Encoding;
 using Microsoft.Azure.Amqp.Framing;
 using NUnit.Framework;
 using System;
 using System.Buffers.Binary;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -44,7 +45,7 @@ namespace Tests
         }
 
         [Test]
-        public void ReadDoubleDescribedString8()
+        public void ReadDescribedString8()
         {
             string value = "ABC";
             var descriptor = new DescribedType("GHI", "DEF");
@@ -158,6 +159,21 @@ namespace Tests
                 var decoded = result.AsMemory();
                 decoded.Span.SequenceEqual(_randomInt32_1M);
             }
+        }
+
+        [Test]
+        public void MessageReader()
+        {
+            var value = new AmqpValue()
+            {
+                Value = "ABC",
+                Descriptor = "DEF"
+            };
+
+            var message = AmqpMessage.Create(value);
+            //message.Header.Durable = true;
+
+            var payload = message.GetPayload();
         }
     }
 }

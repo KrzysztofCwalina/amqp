@@ -1,38 +1,13 @@
 ﻿using System;
 using System.Buffers.Binary;
 
-namespace Alan.Amqp
+// spec http://docs.oasis-open.org/amqp/core/v1.0/os/amqp-core-complete-v1.0-os.pdf
+
+namespace System.Buffers.Amqp
 {
-    public ref struct AmqpValue
-    {
-
-    }
-    public enum AmqpToken : byte
-    {
-        // strings
-        Descriptor = 1,
-        Binary = 2,
-        String,
-
-        // collections
-        Array, // monomorphic
-        ArrayEnd,
-        List, // polymorphic
-        ListEnd,
-        Map,
-
-        // primitives
-        Null,
-        Boolean,
-        Int32,
-
-        // control
-        EndOfData = byte.MaxValue
-    }
-
     public ref struct AmqpReader
     {
-        Span<byte> _buffer;
+        ReadOnlySpan<byte> _buffer;
         int _current;
         int _currentLength;
         int _next;
@@ -40,7 +15,7 @@ namespace Alan.Amqp
         // Array Specific
         AmqpType _itemType;
 
-        public AmqpReader(Span<byte> buffer)
+        public AmqpReader(ReadOnlySpan<byte> buffer)
         {
             _buffer = buffer;
             CurrentType = default;
@@ -173,5 +148,28 @@ namespace Alan.Amqp
             if (_currentLength == 0) CurrentType = AmqpToken.ArrayEnd;
             return value;
         }
+    }
+
+    public enum AmqpToken : byte
+    {
+        // strings
+        Descriptor = 1,
+        Binary = 2,
+        String,
+
+        // collections
+        Array, // monomorphic
+        ArrayEnd,
+        List, // polymorphic
+        ListEnd,
+        Map,
+
+        // primitives
+        Null,
+        Boolean,
+        Int32,
+
+        // control
+        EndOfData = byte.MaxValue
     }
 }

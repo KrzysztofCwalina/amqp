@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Alan.Amqp
+namespace System.Buffers.Amqp
 {
     public enum AmqpType : byte
     {

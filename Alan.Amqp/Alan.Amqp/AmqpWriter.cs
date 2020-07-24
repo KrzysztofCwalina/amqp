@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Buffers;
 using System.Buffers.Binary;
-using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Alan.Amqp
+namespace System.Buffers.Amqp
 {
     public static class AmqpWriter
     {

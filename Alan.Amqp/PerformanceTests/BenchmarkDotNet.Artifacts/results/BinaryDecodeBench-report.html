@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>DecoderBench-20200724-092021</title>
+<title>BinaryDecodeBench-20200724-124911</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -22,11 +22,11 @@ Intel Core i7-6700K CPU 4.00GHz (Skylake), 1 CPU, 8 logical and 4 physical cores
 <pre><code></code></pre>
 
 <table>
-<thead><tr><th>                  Method</th><th> Mean</th><th>Error</th><th>StdDev</th><th>Gen 0</th><th>Gen 1</th><th>Gen 2</th><th>Allocated</th>
+<thead><tr><th>            Method</th><th>    Mean</th><th>  Error</th><th> StdDev</th><th>Gen 0</th><th>Gen 1</th><th>Gen 2</th><th>Allocated</th>
 </tr>
-</thead><tbody><tr><td>ArrayInt32_Decode1M_MA</td><td>92,688.1 &mu;s</td><td>659.51 &mu;s</td><td>616.91 &mu;s</td><td>6000.0000</td><td>-</td><td>-</td><td>29360271 B</td>
-</tr><tr><td>ArrayInt32_Decode1M_AC</td><td>896.1 &mu;s</td><td>6.47 &mu;s</td><td>6.06 &mu;s</td><td>-</td><td>-</td><td>-</td><td>1 B</td>
-</tr><tr><td>ArrayInt32_Decode1M_AC_ToArray</td><td>2,191.1 &mu;s</td><td>29.06 &mu;s</td><td>27.19 &mu;s</td><td>39.0625</td><td>39.0625</td><td>39.0625</td><td>4194333 B</td>
+</thead><tbody><tr><td>Bytes_Decode_MAA</td><td>440,118.792 ns</td><td>995.3619 ns</td><td>882.3624 ns</td><td>10.7422</td><td>10.7422</td><td>10.7422</td><td>1048601 B</td>
+</tr><tr><td>Bytes_Decode_SBA</td><td>4.841 ns</td><td>0.0165 ns</td><td>0.0155 ns</td><td>-</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>Bytes_Decode_SBA_ToArray</td><td>462,939.020 ns</td><td>4,602.3062 ns</td><td>4,305.0001 ns</td><td>11.7188</td><td>11.7188</td><td>11.7188</td><td>1048601 B</td>
 </tr></tbody></table>
 </body>
 </html>

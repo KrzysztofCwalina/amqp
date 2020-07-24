@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ArrayDecodeBench-20200724-140453</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.18362.959 (1903/May2019Update/19H1)
+Intel Core i7-6700K CPU 4.00GHz (Skylake), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=5.0.100-preview.3.20216.6
+  [Host]     : .NET Core 3.1.2 (CoreCLR 4.700.20.6602, CoreFX 4.700.20.6702), X64 RyuJIT
+  DefaultJob : .NET Core 3.1.2 (CoreCLR 4.700.20.6602, CoreFX 4.700.20.6702), X64 RyuJIT
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>                   Method</th><th> Mean</th><th>Error</th><th>StdDev</th><th>Gen 0</th><th>Gen 1</th><th>Gen 2</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>ArrayInt32Decode_1M_MAA</td><td>90,001.8 &mu;s</td><td>393.87 &mu;s</td><td>328.90 &mu;s</td><td>6000.0000</td><td>-</td><td>-</td><td>29360380 B</td>
+</tr><tr><td>ArrayInt32Decode_1M_SBA</td><td>890.5 &mu;s</td><td>2.85 &mu;s</td><td>2.38 &mu;s</td><td>-</td><td>-</td><td>-</td><td>2 B</td>
+</tr><tr><td>ArrayInt32Decode_1M_SBA_ToArray</td><td>2,194.8 &mu;s</td><td>5.32 &mu;s</td><td>4.71 &mu;s</td><td>39.0625</td><td>39.0625</td><td>39.0625</td><td>4194328 B</td>
+</tr><tr><td>ArrayInt32Decode_1K_MAA</td><td>86,279.3 &mu;s</td><td>549.68 &mu;s</td><td>487.28 &mu;s</td><td>6000.0000</td><td>-</td><td>-</td><td>29360399 B</td>
+</tr><tr><td>ArrayInt32Decode_1K_SBA</td><td>890.3 &mu;s</td><td>2.15 &mu;s</td><td>1.80 &mu;s</td><td>-</td><td>-</td><td>-</td><td>1 B</td>
+</tr><tr><td>ArrayInt32Decode_1K_SBA_ToArray</td><td>2,192.5 &mu;s</td><td>9.25 &mu;s</td><td>8.65 &mu;s</td><td>39.0625</td><td>39.0625</td><td>39.0625</td><td>4194333 B</td>
+</tr></tbody></table>
+</body>
+</html>
