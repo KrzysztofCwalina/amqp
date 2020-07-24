@@ -42,8 +42,10 @@ public class AmqpBench
         EncodedInt32Array1M = ScratchByteBuffer.Buffer.AsMemory(0, ScratchByteBuffer.WritePos).ToArray();
         EncodedInt32Array1MBuffer = new ByteBuffer(EncodedInt32Array1M, 0, EncodedInt32Array1M.Length);
 
+        ScratchByteBuffer.Reset();
+        AmqpCodec.EncodeArray(RandomInt32Array1K, ScratchByteBuffer);
         EncodedInt32Array1K = ScratchByteBuffer.Buffer.AsMemory(0, ScratchByteBuffer.WritePos).ToArray();
-        EncodedInt32Array1KBuffer = new ByteBuffer(EncodedInt32Array1M, 0, EncodedInt32Array1M.Length);
+        EncodedInt32Array1KBuffer = new ByteBuffer(EncodedInt32Array1K, 0, EncodedInt32Array1M.Length);
     }
 }
 
