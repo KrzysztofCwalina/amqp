@@ -83,7 +83,7 @@ namespace Tests
         public void WriteString8()
         {
             byte[] buffer = new byte[256];
-            Assert.True(AmqpWriter.TryWrite(buffer, s_text, out int written));
+            Assert.True(AmqpWriter.TryWriteString(buffer, s_text, out int written));
             Assert.AreEqual(((byte)AmqpType.String8), buffer[0]);
             Assert.AreEqual(s_text_bytes.Length, buffer[1]);
             Assert.True(s_text_bytes.Span.SequenceEqual(buffer.AsSpan(2, written - 2)));
@@ -127,7 +127,7 @@ namespace Tests
         public void ComplexReader()
         {
             byte[] buffer = new byte[1024];
-            AmqpWriter.TryWrite(buffer, s_text, out int written);
+            AmqpWriter.TryWriteString(buffer, s_text, out int written);
 
             var reader = new AmqpReader(buffer.AsSpan().Slice(0, written));
             while (reader.MoveNext() != AmqpToken.EndOfData)

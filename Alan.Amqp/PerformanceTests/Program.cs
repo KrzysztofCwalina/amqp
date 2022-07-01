@@ -112,7 +112,7 @@ public class ArrayEncodeBench : AmqpBench
     [Benchmark]
     public ReadOnlyMemory<byte> ArrayInt32Encode_SBA_1M()
     {
-        AmqpWriter.TryWriteArray(ScratchArray, RandomInt32Array1M, out int written);
+        AmqpWriter.TryWriteArrayInt(ScratchArray, RandomInt32Array1M, out int written);
         return ScratchArray.AsMemory(0, written);
     }
 
@@ -127,7 +127,7 @@ public class ArrayEncodeBench : AmqpBench
     [Benchmark]
     public ReadOnlyMemory<byte> ArrayInt32Encode_SBA_1K()
     {
-        AmqpWriter.TryWriteArray(ScratchArray, RandomInt32Array1K, out int written);
+        AmqpWriter.TryWriteArrayInt(ScratchArray, RandomInt32Array1K, out int written);
         return ScratchArray.AsMemory(0, written);
     }
 }
